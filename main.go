@@ -2,10 +2,19 @@ package main
 
 import (
 	"fmt"
+	"time"
 
 	"github.com/tebeka/selenium"
 	"github.com/tebeka/selenium/chrome"
 )
+
+func waitCondition(wd selenium.WebDriver) (bool, error) {
+	title, err := wd.Title()
+	if title == "公众号" {
+		return true, nil
+	}
+	return false, err
+}
 
 func main() {
 	// Start a Selenium WebDriver server instance (if one is not already
@@ -25,6 +34,7 @@ func main() {
 	if err != nil {
 		return
 	}
+	defer service.Stop()
 
 	args := []string{
 		"--user-agent=Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/96.0.4664.55 Safari/537.36",
@@ -38,9 +48,14 @@ func main() {
 
 	wd, _ := selenium.NewRemote(caps, fmt.Sprintf("http://localhost:%d/wd/hub", port))
 
-	if err := wd.Get("https://www.baidu.com"); err != nil {
+	if err := wd.Get("https://mp.weixin.qq.com/"); err != nil {
 		panic(err)
 	}
 
-	defer service.Stop()
+	wd.Wait(waitCondition)
+
+	cookies, _ := wd.GetCookies()
+	print(cookies)
+
+	time.Sleep(5000)
 }
