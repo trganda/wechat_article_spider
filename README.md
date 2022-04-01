@@ -4,8 +4,8 @@
 
 ## Table of Contents
 - [Introduction](#introduction)
-   - [Usage](#usage) 
-   - [ChromeDriver](#chromedriver) 
+   - [ChromeDriver](#chromedriver)
+   - [Usage](#usage)  
 - [Features](#features)
 - [Principle](#Principle)
 - [License](#license)
@@ -14,7 +14,11 @@
 
 ### ChromeDriver
 
-为了方便登录和获取`cookie`，需要使用到`selenium`，请先下载[chromedriver](https://sites.google.com/a/chromium.org/chromedriver/)并安装。
+为了方便登录和获取`cookie`，需要使用到`selenium`，请先下载对应Chrome版本的[chromedriver](https://sites.google.com/a/chromium.org/chromedriver/)并安装。
+
+### Usage
+
+安装好浏览器和对应的`brower dirver`后
 
 ## Features
 
