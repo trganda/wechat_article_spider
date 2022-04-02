@@ -1,4 +1,4 @@
-module trganda/hello
+module trganda/wechat_crawer
 
 go 1.17
 
