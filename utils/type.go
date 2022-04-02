@@ -12,3 +12,18 @@ type AppMsgArgs struct {
 	FakeId string `json:"fakeid"` // id
 	Type   string `json:"type"`   // 9
 }
+
+// A brief struct for wechat article
+type AppMsgListItem struct {
+	Aid        string `json:"aid"`
+	AlbumId    string `json:"album_id"`
+	AppmsgId   string `json:"appmsgid"`
+	Checking   string `json:"checking"`
+	Cover      string `json:"cover"`
+	CreateTime string `json:"create_time"`
+	Digest     string `json:"digest"`
+	ItemIdx    string `json:"itemidx"`
+	Link       string `json:"link"`
+	Title      string `json:"title"`
+	UpdateTime string `json:"update_time"`
+}
