@@ -2,6 +2,8 @@ package crawer
 
 import (
 	"fmt"
+	"io"
+	"net/http"
 	"net/url"
 	"strings"
 	"time"
@@ -19,7 +21,7 @@ func waitCondition(wd selenium.WebDriver) (bool, error) {
 	return false, err
 }
 
-func Login() (map[string]string, utils.AppMsgArgs, error) {
+func Login() ([]selenium.Cookie, utils.AppMsgArgs, error) {
 
 	// Start a Selenium WebDriver server instance (if one is not already
 	// running).
@@ -57,14 +59,6 @@ func Login() (map[string]string, utils.AppMsgArgs, error) {
 	}
 
 	wd.Wait(waitCondition)
-	materialElem, err := wd.FindElement(selenium.ByXPATH, "//*[@id=\"js_level2_title\"]/li[1]/ul/li[1]/a")
-	if err != nil {
-		panic(err)
-	}
-
-	if err := materialElem.Click(); err != nil {
-		panic(err)
-	}
 
 	time.Sleep(3000)
 
@@ -90,12 +84,52 @@ func Login() (map[string]string, utils.AppMsgArgs, error) {
 		return nil, utils.AppMsgArgs{}, err
 	}
 
-	core_cookie := make(map[string]string)
-	// ret := AppMsgArgs
-	for idx := 0; idx < len(cookies); idx++ {
-		cookie := cookies[idx]
-		core_cookie[cookie.Name] = cookie.Value
+	return cookies, appmsgArgs, err
+}
+
+func CrawArticle(cookies []selenium.Cookie, getArgs utils.AppMsgArgs) string {
+	client := &http.Client{}
+
+	targetUrl := "https://mp.weixin.qq.com/cgi-bin/appmsg"
+
+	// buf := strings.NewReader(para.Encode())
+
+	// Create a self defined request
+	request, _ := http.NewRequest("GET", targetUrl, nil)
+	request.Header.Set("User-Agent", "Mozilla/5.0 (Windows NT 6.1; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/100.0.4896.60 Safari/537.36")
+	request.Header.Set("X-Requested-With", "XMLHttpRequest")
+
+	// Convert getArgs to url
+	para := request.URL.Query()
+	para.Add("action", getArgs.Action)
+	para.Add("begin", getArgs.Begin)
+	para.Add("count", getArgs.Count)
+	para.Add("fakeid", getArgs.FakeId)
+	para.Add("type", getArgs.Type)
+	para.Add("query", getArgs.Query)
+	para.Add("token", getArgs.Token)
+	para.Add("lang", getArgs.Lang)
+	para.Add("f", getArgs.F)
+	para.Add("ajax", getArgs.Ajax)
+
+	request.URL.RawQuery = para.Encode()
+
+	httpCookies := utils.ConvertToHttpCookie(cookies)
+
+	for idx := 0; idx < len(httpCookies); idx++ {
+		request.AddCookie(&httpCookies[idx])
 	}
 
-	return core_cookie, appmsgArgs, err
+	resp, err := client.Do(request)
+	if err != nil {
+		panic(err)
+	}
+	defer resp.Body.Close()
+
+	body, err := io.ReadAll(resp.Body)
+	if err != nil {
+		panic(err)
+	}
+
+	return string(body)
 }
