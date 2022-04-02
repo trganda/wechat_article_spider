@@ -27,3 +27,14 @@ type AppMsgListItem struct {
 	Title      string `json:"title"`
 	UpdateTime string `json:"update_time"`
 }
+
+type BaseResp struct {
+	ErrMsg string `json:"err_msg"`
+	Ret    int    `json:"ret"`
+}
+
+type AppMsg struct {
+	AppMsgCnt  int              `json:"app_msg_cnt"`
+	AppMsgList []AppMsgListItem `json:"app_msg_list"`
+	Resp       BaseResp         `json:"base_resp"`
+}
