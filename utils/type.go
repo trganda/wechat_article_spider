@@ -1,5 +1,17 @@
 package utils
 
+
+type Config struct {
+	WebDriver Driver `yaml:"webdriver"`
+}
+
+type Driver struct {
+	ChromeDriver string `yaml:"chromedriver"`
+	SeleniumServer string `yaml:"seleniumserver"`
+	Port string `yaml:"port"`
+}
+
+// Parameter struct of request
 type AppMsgArgs struct {
 	Token  string `json:"token"` // csrf token
 	Lang   string `json:"lang"`  // language
