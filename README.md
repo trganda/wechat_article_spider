@@ -14,11 +14,19 @@
 
 ### ChromeDriver
 
-为了方便登录和获取`cookie`，需要使用到`selenium`，请先下载对应Chrome版本的[chromedriver](https://sites.google.com/a/chromium.org/chromedriver/)并安装。
+为了方便登录和获取`cookie`，需要使用到`selenium`，请先下载对应`chrome`浏览器版本的[chromedriver](https://sites.google.com/a/chromium.org/chromedriver/)，并同时安装`chrome`浏览器。
+
+将下载好的`brower driver`放在项目的`vendor`文件夹下，并修改配置文件中它的位置。当然，你也可以放在其它路径下。
 
 ### Usage
 
-安装好浏览器和对应的`brower dirver`后
+安装好浏览器和对应的`brower dirver`后，直接运行
+
+```go
+go run main.go
+```
+
+会打印出json格式的文章相关数据，及其链接。
 
 ## Features
 
