@@ -1,14 +1,20 @@
 package utils
 
-
 type Config struct {
-	WebDriver Driver `yaml:"webdriver"`
+	WebDriver       Driver      `yaml:"webdriver"`
+	AppMsgQueryArgs AppMsgQuery `yaml:"appmsg"`
 }
 
 type Driver struct {
-	ChromeDriver string `yaml:"chromedriver"`
+	ChromeDriver   string `yaml:"chromedriver"`
 	SeleniumServer string `yaml:"seleniumserver"`
-	Port string `yaml:"port"`
+	Port           string `yaml:"port"`
+}
+
+type AppMsgQuery struct {
+	Query    string `yaml:"query"`
+	FakeId   string `yaml:"fakeid"`
+	TimeLine string `yaml:"timeline"`
 }
 
 // Parameter struct of request
