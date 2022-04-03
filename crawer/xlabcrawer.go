@@ -7,6 +7,7 @@ import (
 	"net/url"
 	"strings"
 	"time"
+	"wechat_crawer/config"
 	"wechat_crawer/utils"
 
 	"github.com/tebeka/selenium"
@@ -25,16 +26,15 @@ func Login() ([]selenium.Cookie, utils.AppMsgArgs, error) {
 
 	// Start a Selenium WebDriver server instance (if one is not already
 	// running).
-	const (
+	var (
 		// These paths will be different on your system.
-		seleniumPath     = "vendors/selenium-server-4.1.3.jar"
-		googleDriverPath = "vendors/chromedriver"
-		port             = 9515
+		googleDriverPath = config.Cfg.WebDriver.ChromeDriver
+		port             = config.Cfg.WebDriver.Port
 	)
 
 	selenium.SetDebug(true)
 
-	opts := []selenium.ServiceOption{}
+	var opts []selenium.ServiceOption
 
 	service, err := selenium.NewChromeDriverService(googleDriverPath, port, opts...)
 	if err != nil {
@@ -43,7 +43,7 @@ func Login() ([]selenium.Cookie, utils.AppMsgArgs, error) {
 	defer service.Stop()
 
 	args := []string{
-		"--user-agent=Mozilla/5.0 (Windows NT 6.1; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/100.0.4896.60 Safari/537.36",
+		"--user-agent=" + config.Cfg.WebDriver.Headers.UserAgent,
 	}
 
 	chromeCaps := chrome.Capabilities{Args: args}
@@ -58,7 +58,10 @@ func Login() ([]selenium.Cookie, utils.AppMsgArgs, error) {
 		panic(err)
 	}
 
-	wd.Wait(waitCondition)
+	err = wd.Wait(waitCondition)
+	if err != nil {
+		return nil, utils.AppMsgArgs{}, err
+	}
 
 	time.Sleep(3000)
 
@@ -92,11 +95,9 @@ func CrawArticle(cookies []selenium.Cookie, getArgs utils.AppMsgArgs) string {
 
 	targetUrl := "https://mp.weixin.qq.com/cgi-bin/appmsg"
 
-	// buf := strings.NewReader(para.Encode())
-
 	// Create a self defined request
 	request, _ := http.NewRequest("GET", targetUrl, nil)
-	request.Header.Set("User-Agent", "Mozilla/5.0 (Windows NT 6.1; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/100.0.4896.60 Safari/537.36")
+	request.Header.Set("User-Agent", config.Cfg.WebDriver.Headers.UserAgent)
 	request.Header.Set("X-Requested-With", "XMLHttpRequest")
 
 	// Convert getArgs to url

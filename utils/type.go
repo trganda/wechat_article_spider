@@ -9,6 +9,12 @@ type Driver struct {
 	ChromeDriver   string `yaml:"chromedriver"`
 	SeleniumServer string `yaml:"seleniumserver"`
 	Port           int    `yaml:"port"`
+
+	Headers BrowserHeaders `yaml:"headers"`
+}
+
+type BrowserHeaders struct {
+	UserAgent string `yaml:"user-agent"`
 }
 
 type AppMsgQuery struct {
@@ -17,7 +23,7 @@ type AppMsgQuery struct {
 	TimeLine string `yaml:"timeline"`
 }
 
-// Parameter struct of request
+// AppMsgArgs Parameter struct of request
 type AppMsgArgs struct {
 	Token  string `json:"token"` // csrf token
 	Lang   string `json:"lang"`  // language
@@ -31,7 +37,7 @@ type AppMsgArgs struct {
 	Type   string `json:"type"`   // 9
 }
 
-// A brief struct for wechat article
+// AppMsgListItem A brief struct for wechat article
 type AppMsgListItem struct {
 	Aid        string `json:"aid"`
 	AlbumId    string `json:"album_id"`

@@ -6,24 +6,21 @@ import (
 	"github.com/tebeka/selenium"
 	"io/ioutil"
 	"os"
+	"wechat_crawer/config"
 	"wechat_crawer/crawer"
 	"wechat_crawer/utils"
 )
 
 func main() {
-	//test()
+	config.InitConfig("config.yaml")
+
 	var cookies []selenium.Cookie
 	var urlArgs utils.AppMsgArgs
 	var err error
 
 	if !utils.FileExist("data/cookies.json") || !utils.FileExist("data/urlargs.json") {
 
-		os.MkdirAll("data", os.ModePerm)
-		_, err = os.Create("data/cookies.json")
-		if err != nil {
-			return
-		}
-		_, err = os.Create("data/urlargs.json")
+		err = os.MkdirAll("data", os.ModePerm)
 		if err != nil {
 			return
 		}

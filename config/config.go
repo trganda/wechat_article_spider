@@ -1,10 +1,10 @@
 package config
 
 import (
+	"gopkg.in/yaml.v2"
+	"io/ioutil"
 	"time"
 	"wechat_crawer/utils"
-
-	"github.com/spf13/viper"
 )
 
 var (
@@ -24,16 +24,12 @@ var (
 var Cfg *utils.Config
 
 func InitConfig(path string) error {
-	viper.SetConfigFile(path)
-	viper.SetConfigType("yaml")
-
 	if utils.FileExist(path) {
-		err := viper.ReadInConfig()
+		yamlFile, _ := ioutil.ReadFile(path)
+		err := yaml.Unmarshal(yamlFile, &Cfg)
 		if err != nil {
 			return err
 		}
-
-		viper.Unmarshal(&Cfg)
 	}
 
 	return nil
