@@ -8,7 +8,7 @@ type Config struct {
 type Driver struct {
 	ChromeDriver   string `yaml:"chromedriver"`
 	SeleniumServer string `yaml:"seleniumserver"`
-	Port           string `yaml:"port"`
+	Port           int    `yaml:"port"`
 }
 
 type AppMsgQuery struct {
@@ -23,7 +23,7 @@ type AppMsgArgs struct {
 	Lang   string `json:"lang"`  // language
 	F      string `json:"f"`     // format
 	Ajax   string `json:"ajax"`  // request type
-	Action string `jsong:"list_ex"`
+	Action string `json:"list_ex"`
 	Begin  string `json:"begin"`  // begin
 	Count  string `json:"count"`  // number pre-request
 	Query  string `json:"query"`  // query condition

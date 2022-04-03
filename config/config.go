@@ -12,8 +12,8 @@ var (
 	TAG        string = ""
 	GOVERSIONI string = "1.17.3"
 
-	ChromeDriver       string = "verdors/chromedriver"
-	SeleniumServerPath string = "verdors/selenium-server-4.1.3.jar"
+	ChromeDriver       string = "vendors/chromedriver"
+	SeleniumServerPath string = "vendors/selenium-server-4.1.3.jar"
 	Port               int    = 9515
 
 	Query    string    = "每日安全动态推送"

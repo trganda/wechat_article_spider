@@ -4,6 +4,6 @@ webdriver:
   port: 9515
 
 appmsg:
-  query: "每日安全动态推送"
-  fakeid: "MzA5NDYyNDI0MA=="
-  timeline: ""
+  query: 
+  fakeid: MzA5NDYyNDI0MA==
+  timeline:

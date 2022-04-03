@@ -28,7 +28,7 @@ func Login() ([]selenium.Cookie, utils.AppMsgArgs, error) {
 	const (
 		// These paths will be different on your system.
 		seleniumPath     = "vendors/selenium-server-4.1.3.jar"
-		googleDriverPath = "vendors/chromedriver.exe"
+		googleDriverPath = "vendors/chromedriver"
 		port             = 9515
 	)
 
