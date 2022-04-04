@@ -97,8 +97,8 @@ func Login() ([]selenium.Cookie, utils.AppMsgArgs, error) {
 		Action: "list_ex",
 		Begin:  "0",
 		Count:  "10",
-		Query:  "",
-		FakeId: "MzA5NDYyNDI0MA==",
+		Query:  config.Cfg.AppMsgQueryArgs.Query,
+		FakeId: config.Cfg.AppMsgQueryArgs.FakeId,
 		Type:   "9",
 	}
 
@@ -110,29 +110,42 @@ func Login() ([]selenium.Cookie, utils.AppMsgArgs, error) {
 	return cookies, appmsgArgs, err
 }
 
-func CrawArticlewithCondition(cookies []selenium.Cookie, getArgs utils.AppMsgArgs, condition utils.Condition) utils.AppMsgListItems {
-	jsonData := CrawArticle(cookies, getArgs)
+func CrawArticlewithCondition(cookies []selenium.Cookie,
+	getArgs utils.AppMsgArgs, condition utils.Condition) utils.AppMsgListItems {
+
+	var ret bool
+	var err error
 
 	var appMsg utils.AppMsg
 	var appMsgList utils.AppMsgListItems
 
-	err := json.Unmarshal(jsonData, &appMsg)
-	if err != nil {
-		log.Fatalf("unmarshal the crawed json data to utils.AppMsg failed. error: " + err.Error())
-		return appMsgList
-	}
+	for true {
+		jsonData := CrawArticle(cookies, getArgs)
+		// Forward search
+		getArgs.Begin = getArgs.Begin + getArgs.Count
 
-	if appMsg.Resp.Ret != 0 {
-		log.Printf("response with error: %s \n", appMsg.Resp.ErrMsg)
-		return appMsgList
-	}
+		err = json.Unmarshal(jsonData, &appMsg)
+		if err != nil {
+			log.Fatalf("unmarshal the crawed json data to utils.AppMsg failed. error: " + err.Error())
+			return appMsgList
+		}
 
-	for idx := 0; idx < len(appMsg.AppMsgList); idx++ {
-		ret, err := condition(appMsg.AppMsgList[idx])
+		if appMsg.Resp.Ret != 0 {
+			log.Printf("response with error: %s \n", appMsg.Resp.ErrMsg)
+			return appMsgList
+		}
+
+		for idx := 0; idx < len(appMsg.AppMsgList); idx++ {
+			ret, err = condition(appMsg.AppMsgList[idx])
+			if err != nil || !ret {
+				break
+			} else if ret {
+				appMsgList.Items = append(appMsgList.Items, appMsg.AppMsgList[idx])
+			}
+		}
+
 		if err != nil || !ret {
-			continue
-		} else if ret {
-			appMsgList.Items = append(appMsgList.Items, appMsg.AppMsgList[idx])
+			break
 		}
 	}
 

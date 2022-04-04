@@ -5,6 +5,6 @@ webdriver:
   headers:
     user-agent: "Mozilla/5.0 (Windows NT 6.1; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/100.0.4896.60 Safari/537.36"
 appmsg:
-  query: 每日安全推荐
+  query: 每日安全
   fakeid: MzA5NDYyNDI0MA==
   timeline: 2022-04-02T15:04:05

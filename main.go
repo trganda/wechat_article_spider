@@ -59,6 +59,9 @@ func main() {
 		if err != nil {
 			fmt.Println(err)
 		}
+
+		urlArgs.Query = config.Cfg.AppMsgQueryArgs.Query
+		urlArgs.FakeId = config.Cfg.AppMsgQueryArgs.FakeId
 	}
 
 	ret := crawer.CrawArticlewithCondition(cookies, urlArgs, crawer.FilterCondition)
