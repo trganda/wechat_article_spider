@@ -1,8 +1,10 @@
 package utils
 
 import (
+	"math/rand"
 	"net/http"
 	"os"
+	"strconv"
 	"time"
 
 	"github.com/tebeka/selenium"
@@ -28,4 +30,19 @@ func ConvertToHttpCookie(sourceCookies []selenium.Cookie) []http.Cookie {
 func FileExist(path string) bool {
 	_, err := os.Lstat(path)
 	return !os.IsNotExist(err)
+}
+
+// RandDuration create a time.Duration between [5 10] second.
+func RandDuration() time.Duration {
+	rand.Seed(time.Now().Unix())
+	randNumber := rand.Intn(5)
+
+	randNumber += 5
+
+	duration, err := time.ParseDuration(strconv.Itoa(randNumber) + "s")
+	if err != nil {
+		return 0
+	}
+
+	return duration
 }

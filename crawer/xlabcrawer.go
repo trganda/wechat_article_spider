@@ -120,6 +120,7 @@ func CrawArticlewithCondition(cookies []selenium.Cookie,
 	var appMsgList utils.AppMsgListItems
 
 	for true {
+		time.Sleep(utils.RandDuration())
 		jsonData := CrawArticle(cookies, getArgs)
 		// Forward search
 		getArgs.Begin = getArgs.Begin + getArgs.Count
