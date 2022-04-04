@@ -26,11 +26,29 @@
 go run main.go
 ```
 
-会打印出json格式的文章相关数据，及其链接。
+会打印出json格式的文章相关数据，如下：
+
+```json
+{
+	"app_msg_list": [
+		{
+			"aid": "2651958330_1",
+			"album_id": "0",
+			"appmsgid": 2651958330,
+			"checking": 0,
+			"cover": "https://mmbiz.qlogo.cn/mmbiz_jpg/dWDic6IAXZsfZ5NKcSyULDMmjMncfAus29aTXCgabeiavgsebgt93sL07iahdxagl04wD6NwuJKCRalEXibDpghUwA/0?wx_fmt=jpeg",
+			"create_time": 1648888670,
+			"digest": "PHP Supply Chain Attack on PEAR；Go 语言将应用新 Mitigation 防御供应链攻击",
+			"itemidx": 1,
+			"link": "http://mp.weixin.qq.com/s?__biz=MzA5NDYyNDI0MA==\u0026mid=2651958330\u0026idx=1\u0026sn=a14fb5f431821a63dff80b219906e029\u0026chksm=8baecca5bcd945b3c1597d267fcd79304c7a5eac32dbb4be2a81f42aee7a9be6e15190e6d86d#rd",
+			"title": "每日安全动态推送(04-02)",
+			"update_time": 1648888670
+		}
+	]
+}
+```
 
 ## Features
 
 ## Principle
-
-## License
 
