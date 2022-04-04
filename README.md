@@ -8,7 +8,6 @@
    - [Usage](#usage)  
 - [Features](#features)
 - [Principle](#Principle)
-- [License](#license)
 
 ## Introduction
 
