@@ -41,15 +41,19 @@ type AppMsgArgs struct {
 type AppMsgListItem struct {
 	Aid        string `json:"aid"`
 	AlbumId    string `json:"album_id"`
-	AppmsgId   string `json:"appmsgid"`
-	Checking   string `json:"checking"`
+	AppmsgId   uint64 `json:"appmsgid"`
+	Checking   uint   `json:"checking"`
 	Cover      string `json:"cover"`
-	CreateTime string `json:"create_time"`
+	CreateTime int64  `json:"create_time"`
 	Digest     string `json:"digest"`
-	ItemIdx    string `json:"itemidx"`
+	ItemIdx    uint   `json:"itemidx"`
 	Link       string `json:"link"`
 	Title      string `json:"title"`
-	UpdateTime string `json:"update_time"`
+	UpdateTime int64  `json:"update_time"`
+}
+
+type AppMsgListItems struct {
+	Items []AppMsgListItem `json:"app_msg_list"`
 }
 
 type BaseResp struct {
@@ -62,3 +66,5 @@ type AppMsg struct {
 	AppMsgList []AppMsgListItem `json:"app_msg_list"`
 	Resp       BaseResp         `json:"base_resp"`
 }
+
+type Condition func(item AppMsgListItem) (bool, error)

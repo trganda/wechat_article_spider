@@ -3,12 +3,15 @@ package main
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/tebeka/selenium"
 	"io/ioutil"
+	"log"
 	"os"
+	"time"
 	"wechat_crawer/config"
 	"wechat_crawer/crawer"
 	"wechat_crawer/utils"
+
+	"github.com/tebeka/selenium"
 )
 
 func main() {
@@ -31,8 +34,8 @@ func main() {
 		}
 
 		// Save cookies and urlArgs as json file
-		jsonCookies, err := json.MarshalIndent(cookies, "", "\t")
-		jsonurlArgs, err := json.MarshalIndent(urlArgs, "", "\t")
+		jsonCookies, err := json.MarshalIndent(cookies, "", "  ")
+		jsonurlArgs, err := json.MarshalIndent(urlArgs, "", "  ")
 
 		err = ioutil.WriteFile("data/cookies.json", jsonCookies, 0644)
 		if err != nil {
@@ -56,8 +59,18 @@ func main() {
 		if err != nil {
 			fmt.Println(err)
 		}
+
+		urlArgs.Query = config.Cfg.AppMsgQueryArgs.Query
+		urlArgs.FakeId = config.Cfg.AppMsgQueryArgs.FakeId
 	}
 
-	ret := crawer.CrawArticle(cookies, urlArgs)
-	fmt.Println(ret)
+	ret := crawer.CrawArticlewithCondition(cookies, urlArgs, crawer.FilterCondition)
+	jsonRet, _ := json.MarshalIndent(ret, "", "  ")
+
+	fileName := "data/data-" + time.Now().Format(config.TimeFormat) + ".json"
+	err = ioutil.WriteFile(fileName, jsonRet, 0644)
+	if err != nil {
+		log.Fatalf("writing crawed data to %s error: %s\n", fileName, err.Error())
+		return
+	}
 }
