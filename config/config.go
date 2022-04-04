@@ -19,6 +19,8 @@ var (
 	Query    string    = "每日安全动态推送"
 	FakeId   string    = "MzA5NDYyNDI0MA=="
 	TimeLine time.Time = time.Now()
+
+	TimeFormat string = "2006-01-02T15:04:05"
 )
 
 var Cfg *utils.Config

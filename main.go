@@ -3,12 +3,15 @@ package main
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/tebeka/selenium"
 	"io/ioutil"
+	"log"
 	"os"
+	"time"
 	"wechat_crawer/config"
 	"wechat_crawer/crawer"
 	"wechat_crawer/utils"
+
+	"github.com/tebeka/selenium"
 )
 
 func main() {
@@ -58,6 +61,13 @@ func main() {
 		}
 	}
 
-	ret := crawer.CrawArticle(cookies, urlArgs)
-	fmt.Println(ret)
+	ret := crawer.CrawArticlewithCondition(cookies, urlArgs, crawer.FilterCondition)
+	jsonRet, _ := json.MarshalIndent(ret, "", "\t")
+
+	fileName := "data/data-" + time.Now().Format(config.TimeFormat) + ".json"
+	err = ioutil.WriteFile(fileName, jsonRet, 0644)
+	if err != nil {
+		log.Fatalf("writing crawed data to %s error: %s\n", fileName, err.Error())
+		return
+	}
 }

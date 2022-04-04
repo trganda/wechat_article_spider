@@ -1,8 +1,10 @@
 package crawer
 
 import (
+	"encoding/json"
 	"fmt"
 	"io"
+	"log"
 	"net/http"
 	"net/url"
 	"strings"
@@ -20,6 +22,24 @@ func waitCondition(wd selenium.WebDriver) (bool, error) {
 		return true, nil
 	}
 	return false, err
+}
+
+// FilterCondition Filter the msg item before *timeline*
+func FilterCondition(item utils.AppMsgListItem) (bool, error) {
+	createTime := time.Unix(item.CreateTime, 0)
+	filterTime, err := time.ParseInLocation(config.TimeFormat,
+		config.Cfg.AppMsgQueryArgs.TimeLine, time.Local)
+
+	if err != nil {
+		log.Fatalf("convert configed timeline failed. error: %s\n", err.Error())
+		return false, err
+	}
+
+	if createTime.After(filterTime) || createTime.Equal(filterTime) {
+		return true, nil
+	}
+
+	return false, nil
 }
 
 func Login() ([]selenium.Cookie, utils.AppMsgArgs, error) {
@@ -90,7 +110,36 @@ func Login() ([]selenium.Cookie, utils.AppMsgArgs, error) {
 	return cookies, appmsgArgs, err
 }
 
-func CrawArticle(cookies []selenium.Cookie, getArgs utils.AppMsgArgs) string {
+func CrawArticlewithCondition(cookies []selenium.Cookie, getArgs utils.AppMsgArgs, condition utils.Condition) utils.AppMsgListItems {
+	jsonData := CrawArticle(cookies, getArgs)
+
+	var appMsg utils.AppMsg
+	var appMsgList utils.AppMsgListItems
+
+	err := json.Unmarshal(jsonData, &appMsg)
+	if err != nil {
+		log.Fatalf("unmarshal the crawed json data to utils.AppMsg failed. error: " + err.Error())
+		return appMsgList
+	}
+
+	if appMsg.Resp.Ret != 0 {
+		log.Printf("response with error: %s \n", appMsg.Resp.ErrMsg)
+		return appMsgList
+	}
+
+	for idx := 0; idx < len(appMsg.AppMsgList); idx++ {
+		ret, err := condition(appMsg.AppMsgList[idx])
+		if err != nil || !ret {
+			continue
+		} else if ret {
+			appMsgList.Items = append(appMsgList.Items, appMsg.AppMsgList[idx])
+		}
+	}
+
+	return appMsgList
+}
+
+func CrawArticle(cookies []selenium.Cookie, getArgs utils.AppMsgArgs) []byte {
 	client := &http.Client{}
 
 	targetUrl := "https://mp.weixin.qq.com/cgi-bin/appmsg"
@@ -132,5 +181,5 @@ func CrawArticle(cookies []selenium.Cookie, getArgs utils.AppMsgArgs) string {
 		panic(err)
 	}
 
-	return string(body)
+	return body
 }
