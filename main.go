@@ -34,8 +34,8 @@ func main() {
 		}
 
 		// Save cookies and urlArgs as json file
-		jsonCookies, err := json.MarshalIndent(cookies, "", "\t")
-		jsonurlArgs, err := json.MarshalIndent(urlArgs, "", "\t")
+		jsonCookies, err := json.MarshalIndent(cookies, "", "  ")
+		jsonurlArgs, err := json.MarshalIndent(urlArgs, "", "  ")
 
 		err = ioutil.WriteFile("data/cookies.json", jsonCookies, 0644)
 		if err != nil {
@@ -62,7 +62,7 @@ func main() {
 	}
 
 	ret := crawer.CrawArticlewithCondition(cookies, urlArgs, crawer.FilterCondition)
-	jsonRet, _ := json.MarshalIndent(ret, "", "\t")
+	jsonRet, _ := json.MarshalIndent(ret, "", "  ")
 
 	fileName := "data/data-" + time.Now().Format(config.TimeFormat) + ".json"
 	err = ioutil.WriteFile(fileName, jsonRet, 0644)
