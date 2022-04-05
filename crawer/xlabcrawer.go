@@ -121,7 +121,8 @@ func CrawArticlewithCondition(cookies []selenium.Cookie,
 
 	for true {
 		time.Sleep(utils.RandDuration())
-		jsonData := CrawArticle(cookies, getArgs)
+		jsonData, respCookies := CrawArticle(cookies, getArgs)
+		cookies = respCookies
 		// Forward search
 		getArgs.Begin = getArgs.Begin + getArgs.Count
 
@@ -153,7 +154,7 @@ func CrawArticlewithCondition(cookies []selenium.Cookie,
 	return appMsgList
 }
 
-func CrawArticle(cookies []selenium.Cookie, getArgs utils.AppMsgArgs) []byte {
+func CrawArticle(cookies []selenium.Cookie, getArgs utils.AppMsgArgs) ([]byte, []selenium.Cookie) {
 	client := &http.Client{}
 
 	targetUrl := "https://mp.weixin.qq.com/cgi-bin/appmsg"
@@ -195,5 +196,18 @@ func CrawArticle(cookies []selenium.Cookie, getArgs utils.AppMsgArgs) []byte {
 		panic(err)
 	}
 
-	return body
+	respCookies := resp.Cookies()
+	updatedCookies := cookies
+
+	// Update cookies with response cookies
+	for idx := 0; idx < len(respCookies); idx++ {
+		oldIdx := utils.IdxofCookieswithName(cookies, respCookies[idx].Name)
+		if oldIdx > -1 {
+			updatedCookies[oldIdx] = utils.ConvertToSeleniumCookie(respCookies[idx])
+		} else {
+			updatedCookies = append(updatedCookies, utils.ConvertToSeleniumCookie(respCookies[idx]))
+		}
+	}
+
+	return body, updatedCookies
 }

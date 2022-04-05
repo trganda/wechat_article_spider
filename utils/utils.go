@@ -11,7 +11,7 @@ import (
 )
 
 func ConvertToHttpCookie(sourceCookies []selenium.Cookie) []http.Cookie {
-	cookies := []http.Cookie{}
+	var cookies []http.Cookie
 
 	for idx := 0; idx < len(sourceCookies); idx++ {
 		cookie := http.Cookie{
@@ -19,12 +19,37 @@ func ConvertToHttpCookie(sourceCookies []selenium.Cookie) []http.Cookie {
 			Value:   sourceCookies[idx].Value,
 			Path:    sourceCookies[idx].Path,
 			Domain:  sourceCookies[idx].Domain,
+			Secure:  sourceCookies[idx].Secure,
 			Expires: time.Unix(int64(sourceCookies[idx].Expiry), 0),
 		}
 		cookies = append(cookies, cookie)
 	}
 
 	return cookies
+}
+
+func ConvertToSeleniumCookie(sourceCookies *http.Cookie) selenium.Cookie {
+	var cookie selenium.Cookie
+
+	cookie = selenium.Cookie{
+		Name:   sourceCookies.Name,
+		Value:  sourceCookies.Value,
+		Path:   sourceCookies.Path,
+		Domain: sourceCookies.Domain,
+		Secure: sourceCookies.Secure,
+		Expiry: uint(sourceCookies.Expires.Unix()),
+	}
+
+	return cookie
+}
+
+func IdxofCookieswithName(cookies []selenium.Cookie, name string) int {
+	for idx := 0; idx < len(cookies); idx++ {
+		if cookies[idx].Name == name {
+			return idx
+		}
+	}
+	return -1
 }
 
 func FileExist(path string) bool {
