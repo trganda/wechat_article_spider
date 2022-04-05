@@ -128,12 +128,12 @@ func CrawArticlewithCondition(cookies []selenium.Cookie,
 
 		err = json.Unmarshal(jsonData, &appMsg)
 		if err != nil {
-			log.Fatalf("unmarshal the crawed json data to utils.AppMsg failed. error: " + err.Error())
+			log.Fatalf("unmarshal the response json data to utils.AppMsg failed. error: %s\n", err.Error())
 			return appMsgList
 		}
 
 		if appMsg.Resp.Ret != 0 {
-			log.Printf("response with error: %s \n", appMsg.Resp.ErrMsg)
+			log.Printf("response with error: %s\n", appMsg.Resp.ErrMsg)
 			return appMsgList
 		}
 
@@ -187,13 +187,13 @@ func CrawArticle(cookies []selenium.Cookie, getArgs utils.AppMsgArgs) ([]byte, [
 
 	resp, err := client.Do(request)
 	if err != nil {
-		panic(err)
+		log.Fatalf("sending rqeust error: %s\n", err.Error())
 	}
 	defer resp.Body.Close()
 
 	body, err := io.ReadAll(resp.Body)
 	if err != nil {
-		panic(err)
+		log.Fatalf("reading response body error: %s\n", err.Error())
 	}
 
 	respCookies := resp.Cookies()
