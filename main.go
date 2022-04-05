@@ -25,11 +25,14 @@ func main() {
 
 		err = os.MkdirAll("data", os.ModePerm)
 		if err != nil {
+			log.Fatalf("mkdir data failed. error: %s\n", err.Error())
 			return
 		}
 
+		log.Println("login...")
 		cookies, urlArgs, err = crawer.Login()
 		if err != nil {
+			log.Fatalf("catch cookie failed. error: %s\n", err.Error())
 			return
 		}
 
@@ -39,10 +42,12 @@ func main() {
 
 		err = ioutil.WriteFile("data/cookies.json", jsonCookies, 0644)
 		if err != nil {
+			log.Fatalf("storing cookies error: %s\n", err.Error())
 			return
 		}
 		err = ioutil.WriteFile("data/urlargs.json", jsonurlArgs, 0644)
 		if err != nil {
+			log.Fatalf("storing token error: %s\n", err.Error())
 			return
 		}
 	} else {
@@ -50,6 +55,7 @@ func main() {
 
 		err := json.Unmarshal(buf, &cookies)
 		if err != nil {
+			log.Fatalf("reading cookies error: %s\n", err.Error())
 			fmt.Println(err)
 		}
 
@@ -57,6 +63,7 @@ func main() {
 
 		err = json.Unmarshal(buf, &urlArgs)
 		if err != nil {
+			log.Fatalf("reading token error: %s\n", err.Error())
 			fmt.Println(err)
 		}
 
