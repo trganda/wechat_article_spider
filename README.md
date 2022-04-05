@@ -19,7 +19,7 @@
 
 ### Usage
 
-安装好浏览器和对应的`brower dirver`后，直接运行
+使用前需要先注册微信公众号平台的账号，安装好浏览器和对应的`brower dirver`后，执行
 
 ```go
 go run main.go
@@ -52,6 +52,7 @@ go run main.go
 * ~~支持关键词搜索公众号~~
 * 支持关键词搜索文章
 * 支持根据时间获取文章
+* Cookies动态更新
 
 ## Principle
 
