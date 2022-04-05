@@ -179,7 +179,7 @@ func CrawArticle(cookies []selenium.Cookie, getArgs utils.AppMsgArgs) ([]byte, [
 
 	request.URL.RawQuery = para.Encode()
 
-	httpCookies := utils.ConvertToHttpCookie(cookies)
+	httpCookies := utils.ConvertToHttpCookies(cookies)
 
 	for idx := 0; idx < len(httpCookies); idx++ {
 		request.AddCookie(&httpCookies[idx])

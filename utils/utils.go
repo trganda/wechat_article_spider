@@ -10,7 +10,7 @@ import (
 	"github.com/tebeka/selenium"
 )
 
-func ConvertToHttpCookie(sourceCookies []selenium.Cookie) []http.Cookie {
+func ConvertToHttpCookies(sourceCookies []selenium.Cookie) []http.Cookie {
 	var cookies []http.Cookie
 
 	for idx := 0; idx < len(sourceCookies); idx++ {
