@@ -42,6 +42,10 @@ func FilterCondition(item utils.AppMsgListItem) (bool, error) {
 	return false, nil
 }
 
+func DefaultFilterCondition(item utils.AppMsgListItem) (bool, error) {
+	return true, nil
+}
+
 func Login() ([]selenium.Cookie, utils.AppMsgArgs, error) {
 
 	// Start a Selenium WebDriver server instance (if one is not already

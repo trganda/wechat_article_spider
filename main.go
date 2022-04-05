@@ -71,13 +71,23 @@ func main() {
 		urlArgs.FakeId = config.Cfg.AppMsgQueryArgs.FakeId
 	}
 
-	ret := crawer.CrawArticlewithCondition(cookies, urlArgs, crawer.FilterCondition)
+	var ret utils.AppMsgListItems
+
+	if config.Cfg.AppMsgQueryArgs.TimeLine == "" {
+		ret = crawer.CrawArticlewithCondition(cookies, urlArgs, crawer.DefaultFilterCondition)
+	} else {
+		ret = crawer.CrawArticlewithCondition(cookies, urlArgs, crawer.FilterCondition)
+	}
+	if len(ret.Items) < 1 {
+		log.Fatalf("noting get from server, check you configuration file.")
+	}
 	jsonRet, _ := json.MarshalIndent(ret, "", "  ")
 
 	fileName := "data/data-" + time.Now().Format(config.TimeFormat) + ".json"
 	err = ioutil.WriteFile(fileName, jsonRet, 0644)
 	if err != nil {
-		log.Fatalf("writing crawed data to %s error: %s\n", fileName, err.Error())
+		log.Fatalf("writing data to %s error: %s\n", fileName, err.Error())
 		return
 	}
+	log.Println("writing data to " + fileName)
 }

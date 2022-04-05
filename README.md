@@ -47,12 +47,35 @@ go run main.go
 }
 ```
 
+### 配置文件
+
+通过`yaml`格式的配置文件进行控制。默认读取当前目录下的`config.yaml`文件
+
+```yaml
+webdriver:
+  chromedriver: vendors/chromedriver
+  seleniumserver: vendors/selenium-server-4.1.3.jar
+  port: 9515
+  headers:
+    user-agent: "Mozilla/5.0 (Windows NT 6.1; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/100.0.4896.60 Safari/537.36"
+appmsg:
+  # 文章title关键词
+  query: 每日安全
+  # 公众号的唯一id
+  fakeid: MzA5NDYyNDI0MA==
+  # 时间需要以如下格式进行填写，设定后会获取该时间后（包括该时间）的符合条件的文章
+  timeline: 2022-03-22T15:04:05
+```
+
 ## Features
 
 * ~~支持关键词搜索公众号~~
 * 支持关键词搜索文章
-* 支持根据时间获取文章
+* 支持根据时间来筛选获取文章
 * Cookies动态更新
 
 ## Principle
 
+* 实现的思路很简单，借助了微信公众号平台提供的接口，缺点是需要注册账号并登陆才能使用。
+* 其次，为了避免对注册的账号造成不好的后果，采用的是慢速爬取并动态更新`cookie`。
+* 通过微信公众号平台提供的接口，也可以搜索指定的公众号，获取其唯一id，但当前暂未添加该功能。
