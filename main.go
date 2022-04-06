@@ -81,7 +81,11 @@ func main() {
 	if len(ret.Items) < 1 {
 		log.Fatalf("noting get from server, check you configuration file.")
 	}
-	jsonRet, _ := json.MarshalIndent(ret, "", "  ")
+
+	jsonRet, err := utils.JsonMarshalwithNoHTMLEscape(ret)
+	if err != nil {
+		log.Fatalf("format data to json failed. error: %s\n", err.Error())
+	}
 
 	fileName := "data/data-" + time.Now().Format(config.TimeFormat) + ".json"
 	err = ioutil.WriteFile(fileName, jsonRet, 0644)

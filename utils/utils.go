@@ -1,6 +1,8 @@
 package utils
 
 import (
+	"bytes"
+	"encoding/json"
 	"math/rand"
 	"net/http"
 	"os"
@@ -78,4 +80,18 @@ func RandDuration() time.Duration {
 	}
 
 	return duration
+}
+
+func JsonMarshalwithNoHTMLEscape(data interface{}) ([]byte, error) {
+	buf := bytes.NewBuffer([]byte{})
+
+	jsonEncoder := json.NewEncoder(buf)
+	jsonEncoder.SetEscapeHTML(false)
+	jsonEncoder.SetIndent("", "  ")
+	err := jsonEncoder.Encode(data)
+	if err != nil {
+		return nil, err
+	}
+
+	return buf.Bytes(), nil
 }
