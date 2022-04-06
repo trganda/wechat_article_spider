@@ -14,18 +14,26 @@ func ConvertToHttpCookies(sourceCookies []selenium.Cookie) []http.Cookie {
 	var cookies []http.Cookie
 
 	for idx := 0; idx < len(sourceCookies); idx++ {
-		cookie := http.Cookie{
-			Name:    sourceCookies[idx].Name,
-			Value:   sourceCookies[idx].Value,
-			Path:    sourceCookies[idx].Path,
-			Domain:  sourceCookies[idx].Domain,
-			Secure:  sourceCookies[idx].Secure,
-			Expires: time.Unix(int64(sourceCookies[idx].Expiry), 0),
-		}
+		cookie := ConvertToHttpCookie(sourceCookies[idx])
 		cookies = append(cookies, cookie)
 	}
 
 	return cookies
+}
+
+func ConvertToHttpCookie(sourceCookie selenium.Cookie) http.Cookie {
+	var cookie http.Cookie
+
+	cookie = http.Cookie{
+		Name:    sourceCookie.Name,
+		Value:   sourceCookie.Value,
+		Path:    sourceCookie.Path,
+		Domain:  sourceCookie.Domain,
+		Secure:  sourceCookie.Secure,
+		Expires: time.Unix(int64(sourceCookie.Expiry), 0),
+	}
+
+	return cookie
 }
 
 func ConvertToSeleniumCookie(sourceCookies *http.Cookie) selenium.Cookie {
