@@ -6,6 +6,7 @@ import (
 	"io/ioutil"
 	"log"
 	"os"
+	"strings"
 	"time"
 	"wechat_crawer/config"
 	"wechat_crawer/crawer"
@@ -87,7 +88,7 @@ func main() {
 		log.Fatalf("format data to json failed. error: %s\n", err.Error())
 	}
 
-	fileName := "data/data-" + time.Now().Format(config.TimeFormat) + ".json"
+	fileName := "data/data-" + strings.ReplaceAll(time.Now().Format(config.TimeFormat), ":", "-") + ".json"
 	err = ioutil.WriteFile(fileName, jsonRet, 0644)
 	if err != nil {
 		log.Fatalf("writing data to %s error: %s\n", fileName, err.Error())
