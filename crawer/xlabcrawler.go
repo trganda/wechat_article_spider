@@ -1,9 +1,14 @@
 package crawer
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
+	"github.com/chromedp/cdproto/dom"
+	"github.com/chromedp/cdproto/network"
+	"github.com/chromedp/chromedp"
 	"io"
+	"io/ioutil"
 	"log"
 	"net/http"
 	"net/url"
@@ -15,6 +20,9 @@ import (
 	"github.com/tebeka/selenium"
 	"github.com/tebeka/selenium/chrome"
 )
+
+// this will be used to capture the request id for matching network events
+var requestID network.RequestID
 
 func waitCondition(wd selenium.WebDriver) (bool, error) {
 	title, err := wd.Title()
@@ -112,6 +120,125 @@ func Login() ([]selenium.Cookie, utils.AppMsgArgs, error) {
 	}
 
 	return cookies, appmsgArgs, err
+}
+
+func Logining() {
+
+	ctx, cancel := chromedp.NewExecAllocator(
+		context.Background(),
+
+		// set headless false
+		append(
+			chromedp.DefaultExecAllocatorOptions[:],
+			chromedp.Flag("headless", false),
+		)...,
+	)
+	defer cancel()
+
+	// create context
+	ctx, cancel = chromedp.NewContext(
+		ctx,
+		chromedp.WithLogf(log.Printf),
+	)
+	defer cancel()
+
+	// create a timeout as a safety net to prevent any infinite wait loops
+	ctx, cancel = context.WithTimeout(ctx, 60*time.Second)
+	defer cancel()
+
+	// set up a channel so we can block later while we monitor the download
+	// progress
+	done := make(chan bool)
+	//domUpdated := make(chan bool)
+
+	// set the download url as the chromedp github user avatar
+	urlstr := "https://mp.weixin.qq.com/"
+
+	// set up a listener to watch the network events and close the channel when
+	// complete the request id matching is important both to filter out
+	// unwanted network events and to reference the downloaded file later
+	chromedp.ListenTarget(ctx, func(v interface{}) {
+		switch ev := v.(type) {
+		case *network.EventRequestWillBeSent:
+			log.Printf("EventRequestWillBeSent: %v: %v", ev.RequestID, ev.Request.URL)
+			if ev.Request.URL == urlstr {
+				requestID = ev.RequestID
+			}
+		case *network.EventLoadingFinished:
+			log.Printf("EventLoadingFinished: %v", ev.RequestID)
+			if ev.RequestID == requestID {
+				close(done)
+			}
+		case *dom.EventDocumentUpdated:
+			log.Printf("EventDocumentUpdated")
+		}
+	})
+
+	// all we need to do here is navigate to the download url
+	if err := chromedp.Run(ctx,
+		chromedp.Navigate(urlstr),
+		getQRCode(),
+	); err != nil {
+		log.Fatal(err)
+	}
+
+	// This will block until the chromedp listener closes the channel
+	<-done
+
+	if err := chromedp.Run(ctx, getQRCode()); err != nil {
+		log.Fatal(err)
+	}
+
+	// get the downloaded bytes for the request id
+	//var buf []byte
+	//if err := chromedp.Run(ctx, chromedp.ActionFunc(func(ctx context.Context) error {
+	//	var err error
+	//	buf, err = network.GetResponseBody(requestID).Do(ctx)
+	//	return err
+	//})); err != nil {
+	//	log.Fatal(err)
+	//}
+
+	// write the file to disk - since we hold the bytes we dictate the name and
+	// location
+	//if err := ioutil.WriteFile("download.png", buf, 0644); err != nil {
+	//	log.Fatal(err)
+	//}
+	//log.Print("wrote download.png")
+}
+
+func getQRCode() chromedp.ActionFunc {
+	return func(ctx context.Context) error {
+		var qrCodeURL string
+		var status bool
+
+		chromedp.WaitVisible("#header > div.banner > div > div > " +
+			"div.login__type__container.login__type__container__scan > img")
+		// get location of qr image
+		chromedp.AttributeValue("#header > div.banner > div > div > "+
+			"div.login__type__container.login__type__container__scan > img", "src",
+			&qrCodeURL, &status)
+
+		if status == false {
+			log.Println("get attribute (src) of qr img failed.")
+			return nil
+		}
+
+		// download the image file
+		chromedp.Navigate(qrCodeURL)
+
+		buf, err := network.GetResponseBody(requestID).Do(ctx)
+		if err != nil {
+			return err
+		}
+		if err := ioutil.WriteFile("qrcode.png", buf, 0644); err != nil {
+			return err
+		}
+		log.Println("download to qrcode.png.")
+
+		return nil
+	}
+
 }
 
 func CrawArticlewithCondition(cookies []selenium.Cookie,

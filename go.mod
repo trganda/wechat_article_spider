@@ -37,7 +37,7 @@ require (
 	github.com/tebeka/selenium v0.9.9 // indirect
 	github.com/temoto/robotstxt v1.1.1 // indirect
 	golang.org/x/net v0.0.0-20210813160813-60bc85c4be6d // indirect
-	golang.org/x/sys v0.0.0-20220405210540-1e041c57c461 // indirect
+	golang.org/x/sys v0.0.0-20220406163625-3f8b81556e12 // indirect
 	golang.org/x/text v0.3.7 // indirect
 	google.golang.org/appengine v1.6.7 // indirect
 	google.golang.org/protobuf v1.27.1 // indirect
