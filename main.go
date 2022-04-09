@@ -9,7 +9,7 @@ import (
 	"strings"
 	"time"
 	"wechat_crawer/config"
-	"wechat_crawer/crawer"
+	"wechat_crawer/crawler"
 	"wechat_crawer/utils"
 
 	"github.com/tebeka/selenium"
