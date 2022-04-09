@@ -1,9 +1,11 @@
 package crawer
 
 import (
+	"bytes"
 	"context"
 	"encoding/json"
 	"fmt"
+	"image"
 
 	"io"
 	"io/ioutil"
@@ -208,6 +210,14 @@ func getQRCode(requestID network.RequestID) chromedp.ActionFunc {
 		return nil
 	}
 
+}
+
+func PrintQRCode(buf []byte) {
+	_, s, err := image.Decode(bytes.NewReader(buf))
+	if err != nil {
+		return
+	}
+	log.Print(s)
 }
 
 func CrawArticlewithCondition(cookies []selenium.Cookie,
