@@ -1,16 +1,13 @@
 package utils
 
 type Config struct {
-	WebDriver       Driver      `yaml:"webdriver"`
+	ChromeDP        Driver      `yaml:"chromedp"`
 	AppMsgQueryArgs AppMsgQuery `yaml:"appmsg"`
 }
 
 type Driver struct {
-	ChromeDriver   string `yaml:"chromedriver"`
-	SeleniumServer string `yaml:"seleniumserver"`
-	Port           int    `yaml:"port"`
-
-	Headers BrowserHeaders `yaml:"headers"`
+	Headless bool           `yaml:"headless"`
+	Headers  BrowserHeaders `yaml:"headers"`
 }
 
 type BrowserHeaders struct {
@@ -18,9 +15,10 @@ type BrowserHeaders struct {
 }
 
 type AppMsgQuery struct {
-	Query    string `yaml:"query"`
-	FakeId   string `yaml:"fakeid"`
-	TimeLine string `yaml:"timeline"`
+	Query      string `yaml:"query"`
+	FakeId     string `yaml:"fakeid"`
+	TimeLine   string `yaml:"timeline"`
+	DumpFormat string `yaml:"dumpformat"`
 }
 
 // AppMsgArgs Parameter struct of request

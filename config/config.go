@@ -20,9 +20,10 @@ var (
 	UserAgent string = "Mozilla/5.0 (Windows NT 6.1; Win64; x64) " +
 		"AppleWebKit/537.36 (KHTML, like Gecko) Chrome/100.0.4896.60 Safari/537.36"
 
-	Query    string = "每日安全动态推送"
-	FakeId   string = "MzA5NDYyNDI0MA=="
-	TimeLine string = time.Now().Format(TimeFormat)
+	Query      string = "每日安全动态推送"
+	FakeId     string = "MzA5NDYyNDI0MA=="
+	TimeLine   string = time.Now().Format(TimeFormat)
+	DumpFormat string = "json"
 
 	TimeFormat string = "2006-01-02T15:04:05"
 )
@@ -51,18 +52,17 @@ func InitConfig(path string) error {
 
 func CreateDefaultConfig() utils.Config {
 	return utils.Config{
-		WebDriver: utils.Driver{
-			ChromeDriver:   ChromeDriver,
-			SeleniumServer: SeleniumServerPath,
-			Port:           Port,
+		ChromeDP: utils.Driver{
+			Headless: true,
 			Headers: utils.BrowserHeaders{
 				UserAgent: UserAgent,
 			},
 		},
 		AppMsgQueryArgs: utils.AppMsgQuery{
-			Query:    Query,
-			FakeId:   FakeId,
-			TimeLine: TimeLine,
+			Query:      Query,
+			FakeId:     FakeId,
+			TimeLine:   TimeLine,
+			DumpFormat: DumpFormat,
 		},
 	}
 }

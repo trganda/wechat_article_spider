@@ -78,7 +78,7 @@ func main() {
 		ret = crawer.CrawArticlewithCondition(cookies, urlArgs, crawer.FilterCondition)
 	}
 	if len(ret.Items) < 1 {
-		log.Fatalf("noting get from server, check you configuration file.")
+		log.Fatalf("noting get from server, check you configuration file or cookies.")
 	}
 
 	jsonRet, err := utils.JsonMarshalwithNoHTMLEscape(ret)
@@ -86,11 +86,19 @@ func main() {
 		log.Fatalf("format data to json failed. error: %s\n", err.Error())
 	}
 
-	fileName := "data/data-" + strings.ReplaceAll(time.Now().Format(config.TimeFormat), ":", "-") + ".json"
-	err = ioutil.WriteFile(fileName, jsonRet, 0644)
-	if err != nil {
-		log.Fatalf("writing data to %s error: %s\n", fileName, err.Error())
-		return
+	if config.Cfg.AppMsgQueryArgs.DumpFormat == "json" {
+		fileName := "data/data-" + strings.ReplaceAll(time.Now().Format(config.TimeFormat), ":", "-") + ".json"
+		err = ioutil.WriteFile(fileName, jsonRet, 0644)
+		if err != nil {
+			log.Fatalf("writing data to %s error: %s\n", fileName, err.Error())
+			return
+		}
+		log.Println("writing data to " + fileName)
+	} else if config.Cfg.AppMsgQueryArgs.DumpFormat == "html" {
+		for idx := 0; idx < len(ret.Items); idx++ {
+			ret.Items[idx].Title = strings.ReplaceAll(ret.Items[idx].Title, "<em>", "")
+			ret.Items[idx].Title = strings.ReplaceAll(ret.Items[idx].Title, "</em>", "")
+			crawer.DumpItem(ret.Items[idx])
+		}
 	}
-	log.Println("writing data to " + fileName)
 }

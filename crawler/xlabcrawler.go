@@ -53,9 +53,8 @@ func Login() (utils.Cookies, utils.AppMsgArgs, error) {
 		// set headless false
 		append(
 			chromedp.DefaultExecAllocatorOptions[:],
-			chromedp.Flag("headless", true),
-			chromedp.UserAgent("Mozilla/5.0 (Windows NT 6.3; Win64; x64) "+
-				"AppleWebKit/537.36 (KHTML, like Gecko) Chrome/73.0.3683.103 Safari/537.36"),
+			chromedp.Flag("headless", config.Cfg.ChromeDP.Headless),
+			chromedp.UserAgent(config.Cfg.ChromeDP.Headers.UserAgent),
 		)...,
 	)
 	defer cancel()
@@ -272,7 +271,7 @@ func CrawArticle(cookies utils.Cookies, getArgs utils.AppMsgArgs) ([]byte, utils
 
 	// Create a self defined request
 	request, _ := http.NewRequest("GET", targetUrl, nil)
-	request.Header.Set("User-Agent", config.Cfg.WebDriver.Headers.UserAgent)
+	request.Header.Set("User-Agent", config.Cfg.ChromeDP.Headers.UserAgent)
 	request.Header.Set("X-Requested-With", "XMLHttpRequest")
 
 	// Convert getArgs to url
