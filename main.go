@@ -81,6 +81,11 @@ func main() {
 		log.Fatalf("noting get from server, check you configuration file or cookies.")
 	}
 
+	for idx := 0; idx < len(ret.Items); idx++ {
+		ret.Items[idx].Title = strings.ReplaceAll(ret.Items[idx].Title, "<em>", "")
+		ret.Items[idx].Title = strings.ReplaceAll(ret.Items[idx].Title, "</em>", "")
+	}
+
 	jsonRet, err := utils.JsonMarshalwithNoHTMLEscape(ret)
 	if err != nil {
 		log.Fatalf("format data to json failed. error: %s\n", err.Error())
@@ -96,9 +101,7 @@ func main() {
 		log.Println("writing data to " + fileName)
 	} else if config.Cfg.AppMsgQueryArgs.DumpFormat == "html" {
 		for idx := 0; idx < len(ret.Items); idx++ {
-			ret.Items[idx].Title = strings.ReplaceAll(ret.Items[idx].Title, "<em>", "")
-			ret.Items[idx].Title = strings.ReplaceAll(ret.Items[idx].Title, "</em>", "")
-			crawer.DumpItem(ret.Items[idx])
+			crawer.DumpItem(ret.Items[idx], "data")
 		}
 	}
 }

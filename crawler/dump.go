@@ -16,11 +16,11 @@ import (
 	"github.com/gocolly/colly/v2"
 )
 
-func DumpItem(item utils.AppMsgListItem) {
-	DumpPage(item.Link, item.Title)
+func DumpItem(item utils.AppMsgListItem, rootPrefix string) {
+	DumpPage(item.Link, item.Title, rootPrefix)
 }
 
-func DumpPage(urlPath string, title string) {
+func DumpPage(urlPath string, title string, rootPrefix string) {
 	// [scheme:][//[userinfo@]host][/]path[?query][#fragment]
 	parsedUrl, err := url.Parse(urlPath)
 	if err != nil {
@@ -35,7 +35,7 @@ func DumpPage(urlPath string, title string) {
 			return
 		}
 	}
-	pathPrefix := title + "/"
+	pathPrefix := rootPrefix + "/" + title + "/"
 
 	fmt.Println(parsedUrl.Path)
 
