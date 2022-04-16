@@ -313,7 +313,7 @@ func CrawArticle(cookies utils.Cookies, getArgs utils.AppMsgArgs) ([]byte, utils
 	// Update cookies with response cookies
 	for idx := 0; idx < len(respCookies); idx++ {
 		oldIdx := utils.IdxofCookieswithName(cookies, respCookies[idx].Name)
-		ctCookie := utils.ConvertToSeleniumCookie(respCookies[idx])
+		ctCookie := utils.ConvertToCookie(respCookies[idx])
 		if oldIdx > -1 {
 			*updatedCookies.Cookies[oldIdx] = ctCookie
 		} else {

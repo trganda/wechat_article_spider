@@ -36,7 +36,7 @@ func ConvertToHttpCookie(sourceCookie *Cookie) http.Cookie {
 	return cookie
 }
 
-func ConvertToSeleniumCookie(sourceCookies *http.Cookie) Cookie {
+func ConvertToCookie(sourceCookies *http.Cookie) Cookie {
 	var cookie Cookie
 
 	cookie = Cookie{

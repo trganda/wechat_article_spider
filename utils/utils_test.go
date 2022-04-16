@@ -1,7 +1,6 @@
 package utils
 
 import (
-	"github.com/tebeka/selenium"
 	"net/http"
 	"reflect"
 	"testing"
@@ -9,7 +8,7 @@ import (
 )
 
 func TestConvertToHttpCookie(t *testing.T) {
-	seleniumCookie := selenium.Cookie{
+	cookie := Cookie{
 		Name:   "cookie",
 		Value:  "cookie",
 		Path:   "/",
@@ -27,13 +26,13 @@ func TestConvertToHttpCookie(t *testing.T) {
 		Expires: time.Unix(1649400579, 0),
 	}
 
-	if ret := ConvertToHttpCookie(seleniumCookie); !reflect.DeepEqual(ret, httpCookie) {
-		t.Errorf("convert %v to %v, but %v got.\n", seleniumCookie, httpCookie, ret)
+	if ret := ConvertToHttpCookie(&cookie); !reflect.DeepEqual(ret, httpCookie) {
+		t.Errorf("convert %v to %v, but %v got.\n", cookie, httpCookie, ret)
 	}
 }
 
-func TestConvertToSeleniumCookie(t *testing.T) {
-	seleniumCookie := selenium.Cookie{
+func TestConvertToCookie(t *testing.T) {
+	cookie := Cookie{
 		Name:   "cookie",
 		Value:  "cookie",
 		Path:   "/",
@@ -51,8 +50,8 @@ func TestConvertToSeleniumCookie(t *testing.T) {
 		Expires: time.Unix(1649400579, 0),
 	}
 
-	if ret := ConvertToSeleniumCookie(&httpCookie); !reflect.DeepEqual(ret, seleniumCookie) {
-		t.Errorf("convert %v to %v, but %v got.\n", httpCookie, seleniumCookie, ret)
+	if ret := ConvertToCookie(&httpCookie); !reflect.DeepEqual(ret, cookie) {
+		t.Errorf("convert %v to %v, but %v got.\n", httpCookie, cookie, ret)
 	}
 }
 
