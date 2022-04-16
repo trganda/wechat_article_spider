@@ -27,16 +27,17 @@ func DumpPage(urlPath string, title string, rootPrefix string) {
 		log.Fatalf("parse url %s failed, please check it. error: %s\n", urlPath, err.Error())
 	}
 
+	pathPrefix := rootPrefix + title + "/"
+
 	// Mkdir with title
-	if !utils.FileExist(title) {
-		err := os.Mkdir(title, os.ModePerm)
+	if !utils.FileExist(pathPrefix) {
+		err := os.Mkdir(pathPrefix, os.ModePerm)
 		if err != nil {
 			log.Fatalf("mkdir data failed. error: %s\n", err.Error())
 			return
 		}
 	}
-	pathPrefix := rootPrefix + title + "/"
-
+	
 	fmt.Println(parsedUrl.Path)
 
 	c := colly.NewCollector(
@@ -109,7 +110,10 @@ func DumpPage(urlPath string, title string, rootPrefix string) {
 				if err != nil {
 					return
 				}
-				ioutil.WriteFile(pathPrefix+title+".html", []byte(html), 0644)
+				err = ioutil.WriteFile(pathPrefix+title+".html", []byte(html), 0644)
+				if err != nil {
+					log.Fatalf("dump %s failed, error %s", pathPrefix+title+".html", err)
+				}
 			}
 
 			return
