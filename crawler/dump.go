@@ -35,7 +35,7 @@ func DumpPage(urlPath string, title string, rootPrefix string) {
 			return
 		}
 	}
-	pathPrefix := rootPrefix + "/" + title + "/"
+	pathPrefix := rootPrefix + title + "/"
 
 	fmt.Println(parsedUrl.Path)
 

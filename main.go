@@ -101,7 +101,7 @@ func main() {
 		log.Println("writing data to " + fileName)
 	} else if config.Cfg.AppMsgQueryArgs.DumpFormat == "html" {
 		for idx := 0; idx < len(ret.Items); idx++ {
-			crawer.DumpItem(ret.Items[idx], "data")
+			crawer.DumpItem(ret.Items[idx], "data/")
 		}
 	}
 }

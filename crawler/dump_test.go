@@ -23,5 +23,5 @@ func TestDumpPage(t *testing.T) {
 		UpdateTime: 0,
 	}
 
-	DumpItem(item)
+	DumpItem(item, "")
 }
