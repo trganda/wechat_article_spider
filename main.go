@@ -11,14 +11,12 @@ import (
 	"wechat_crawer/config"
 	"wechat_crawer/crawler"
 	"wechat_crawer/utils"
-
-	"github.com/tebeka/selenium"
 )
 
 func main() {
 	config.InitConfig("config.yaml")
 
-	var cookies []selenium.Cookie
+	var cookies utils.Cookies
 	var urlArgs utils.AppMsgArgs
 	var err error
 

@@ -67,4 +67,17 @@ type AppMsg struct {
 	Resp       BaseResp         `json:"base_resp"`
 }
 
+type Cookies struct {
+	Cookies []*Cookie `json:"cookies"`
+}
+
+type Cookie struct {
+	Name   string `json:"name"`
+	Value  string `json:"value"`
+	Path   string `json:"path"`
+	Domain string `json:"domain"`
+	Secure bool   `json:"secure"`
+	Expiry uint   `json:"expiry"`
+}
+
 type Condition func(item AppMsgListItem) (bool, error)

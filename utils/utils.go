@@ -8,22 +8,20 @@ import (
 	"os"
 	"strconv"
 	"time"
-
-	"github.com/tebeka/selenium"
 )
 
-func ConvertToHttpCookies(sourceCookies []selenium.Cookie) []http.Cookie {
+func ConvertToHttpCookies(sourceCookies Cookies) []http.Cookie {
 	var cookies []http.Cookie
 
-	for idx := 0; idx < len(sourceCookies); idx++ {
-		cookie := ConvertToHttpCookie(sourceCookies[idx])
+	for idx := 0; idx < len(sourceCookies.Cookies); idx++ {
+		cookie := ConvertToHttpCookie(sourceCookies.Cookies[idx])
 		cookies = append(cookies, cookie)
 	}
 
 	return cookies
 }
 
-func ConvertToHttpCookie(sourceCookie selenium.Cookie) http.Cookie {
+func ConvertToHttpCookie(sourceCookie *Cookie) http.Cookie {
 	var cookie http.Cookie
 
 	cookie = http.Cookie{
@@ -38,10 +36,10 @@ func ConvertToHttpCookie(sourceCookie selenium.Cookie) http.Cookie {
 	return cookie
 }
 
-func ConvertToSeleniumCookie(sourceCookies *http.Cookie) selenium.Cookie {
-	var cookie selenium.Cookie
+func ConvertToSeleniumCookie(sourceCookies *http.Cookie) Cookie {
+	var cookie Cookie
 
-	cookie = selenium.Cookie{
+	cookie = Cookie{
 		Name:   sourceCookies.Name,
 		Value:  sourceCookies.Value,
 		Path:   sourceCookies.Path,
@@ -53,9 +51,9 @@ func ConvertToSeleniumCookie(sourceCookies *http.Cookie) selenium.Cookie {
 	return cookie
 }
 
-func IdxofCookieswithName(cookies []selenium.Cookie, name string) int {
-	for idx := 0; idx < len(cookies); idx++ {
-		if cookies[idx].Name == name {
+func IdxofCookieswithName(cookies Cookies, name string) int {
+	for idx := 0; idx < len(cookies.Cookies); idx++ {
+		if cookies.Cookies[idx].Name == name {
 			return idx
 		}
 	}

@@ -6,30 +6,22 @@ import (
 	"encoding/json"
 	"fmt"
 	"image"
-
+	_ "image/jpeg"
 	"io"
 	"io/ioutil"
 	"log"
 	"net/http"
 	"net/url"
-	"strings"
 	"time"
 	"wechat_crawer/config"
 	"wechat_crawer/utils"
 
 	"github.com/chromedp/cdproto/network"
 	"github.com/chromedp/chromedp"
-	"github.com/tebeka/selenium"
-	"github.com/tebeka/selenium/chrome"
+	"github.com/makiuchi-d/gozxing"
+	"github.com/makiuchi-d/gozxing/qrcode"
+	goQrcode "github.com/skip2/go-qrcode"
 )
-
-func waitCondition(wd selenium.WebDriver) (bool, error) {
-	title, err := wd.Title()
-	if title == "公众号" {
-		return true, nil
-	}
-	return false, err
-}
 
 // FilterCondition Filter the msg item before *timeline*
 func FilterCondition(item utils.AppMsgListItem) (bool, error) {
@@ -53,75 +45,7 @@ func DefaultFilterCondition(item utils.AppMsgListItem) (bool, error) {
 	return true, nil
 }
 
-func Login() ([]selenium.Cookie, utils.AppMsgArgs, error) {
-
-	// Start a Selenium WebDriver server instance (if one is not already
-	// running).
-	var (
-		// These paths will be different on your system.
-		googleDriverPath = config.Cfg.WebDriver.ChromeDriver
-		port             = config.Cfg.WebDriver.Port
-	)
-
-	selenium.SetDebug(true)
-
-	var opts []selenium.ServiceOption
-
-	service, err := selenium.NewChromeDriverService(googleDriverPath, port, opts...)
-	if err != nil {
-		return nil, utils.AppMsgArgs{}, err
-	}
-	defer service.Stop()
-
-	args := []string{
-		"--user-agent=" + config.Cfg.WebDriver.Headers.UserAgent,
-	}
-
-	chromeCaps := chrome.Capabilities{Args: args}
-
-	// Connect to the WebDriver instance running locally.
-	caps := selenium.Capabilities{"browserName": "chrome"}
-	caps.AddChrome(chromeCaps)
-
-	wd, _ := selenium.NewRemote(caps, fmt.Sprintf("http://localhost:%d/wd/hub", port))
-
-	if err := wd.Get("https://mp.weixin.qq.com/"); err != nil {
-		panic(err)
-	}
-
-	err = wd.Wait(waitCondition)
-	if err != nil {
-		return nil, utils.AppMsgArgs{}, err
-	}
-
-	time.Sleep(3000)
-
-	// Catch csrf token from url
-	currentURL, _ := wd.CurrentURL()
-	urlArgs, _ := url.ParseQuery(strings.Split(currentURL, "?")[1])
-
-	appmsgArgs := utils.AppMsgArgs{
-		Token:  urlArgs["token"][0],
-		Lang:   "zh_CN",
-		F:      "json",
-		Ajax:   "1",
-		Action: "list_ex",
-		Begin:  "0",
-		Count:  "10",
-		Query:  config.Cfg.AppMsgQueryArgs.Query,
-		FakeId: config.Cfg.AppMsgQueryArgs.FakeId,
-		Type:   "9",
-	}
-
-	cookies, err := wd.GetCookies()
-	if err != nil {
-		return nil, utils.AppMsgArgs{}, err
-	}
-
-	return cookies, appmsgArgs, err
-}
-
-func Logining() {
+func Login() (utils.Cookies, utils.AppMsgArgs, error) {
 
 	ctx, cancel := chromedp.NewExecAllocator(
 		context.Background(),
@@ -149,15 +73,20 @@ func Logining() {
 
 	// set up a channel so we can block later while we monitor the download
 	// progress
-	done := make(chan bool)
-	//domUpdated := make(chan bool)
+	qrDone := make(chan bool)
+	loginDone := make(chan bool)
 
 	// this will be used to capture the request id for matching network events
-	var requestID network.RequestID
+	var qrRequestID network.RequestID
+	var homeRequestID network.RequestID
+
+	// csrf token
+	var token string
 
 	// set the download url as the chromedp github user avatar
 	homeUrl := "https://mp.weixin.qq.com/"
 	qrUrl, _ := url.Parse("https://mp.weixin.qq.com/cgi-bin/scanloginqrcode?action=getqrcode&random=1649474933069")
+	loginUrl, _ := url.Parse("https://mp.weixin.qq.com/cgi-bin/home?t=home/index&lang=zh_CN&token=8")
 
 	// set up a listener to watch the network events and close the channel when
 	// complete the request id matching is important both to filter out
@@ -168,12 +97,19 @@ func Logining() {
 			log.Printf("EventRequestWillBeSent: %v: %v", ev.RequestID, ev.Request.URL)
 			currentUrl, _ := url.Parse(ev.Request.URL)
 			if currentUrl.Host == qrUrl.Host && currentUrl.Query().Get("action") == qrUrl.Query().Get("action") {
-				requestID = ev.RequestID
+				qrRequestID = ev.RequestID
+			} else if currentUrl.Host == qrUrl.Host &&
+				currentUrl.Path == loginUrl.Path &&
+				currentUrl.Query().Get("t") == loginUrl.Query().Get("t") {
+				homeRequestID = ev.RequestID
+				token = currentUrl.Query().Get("token")
 			}
 		case *network.EventLoadingFinished:
 			log.Printf("EventLoadingFinished: %v", ev.RequestID)
-			if ev.RequestID == requestID {
-				close(done)
+			if ev.RequestID == qrRequestID {
+				close(qrDone)
+			} else if ev.RequestID == homeRequestID {
+				close(loginDone)
 			}
 		}
 	})
@@ -186,14 +122,38 @@ func Logining() {
 	}
 
 	// This will block until the qr image has been requested
-	<-done
+	<-qrDone
 
 	if err := chromedp.Run(ctx,
-		getQRCode(requestID),
+		getQRCode(qrRequestID),
 	); err != nil {
 		log.Fatal(err)
 	}
 
+	// This will block until login
+	<-loginDone
+
+	var cookies utils.Cookies
+	if err := chromedp.Run(ctx,
+		waitLogin(&cookies),
+	); err != nil {
+		log.Fatal(err)
+	}
+
+	appmsgArgs := utils.AppMsgArgs{
+		Token:  token,
+		Lang:   "zh_CN",
+		F:      "json",
+		Ajax:   "1",
+		Action: "list_ex",
+		Begin:  "0",
+		Count:  "10",
+		Query:  config.Cfg.AppMsgQueryArgs.Query,
+		FakeId: config.Cfg.AppMsgQueryArgs.FakeId,
+		Type:   "9",
+	}
+
+	return cookies, appmsgArgs, nil
 }
 
 func getQRCode(requestID network.RequestID) chromedp.ActionFunc {
@@ -207,20 +167,61 @@ func getQRCode(requestID network.RequestID) chromedp.ActionFunc {
 		}
 		log.Println("download to qrcode.jpg.")
 
+		PrintQRCode(buf)
+
 		return nil
 	}
+}
 
+func waitLogin(cookies *utils.Cookies) chromedp.ActionFunc {
+	return func(ctx context.Context) error {
+		urlCookies, _ := network.GetCookies().Do(ctx)
+		cookiesData := network.GetAllCookiesReturns{Cookies: urlCookies}
+
+		for idx := 0; idx < len(cookiesData.Cookies); idx++ {
+			curCookie := cookiesData.Cookies[idx]
+			cookie := utils.Cookie{
+				Name:   curCookie.Name,
+				Value:  curCookie.Value,
+				Path:   curCookie.Path,
+				Domain: curCookie.Domain,
+				Secure: curCookie.Secure,
+				Expiry: uint(curCookie.Expires),
+			}
+			cookies.Cookies = append(cookies.Cookies, &cookie)
+		}
+
+		return nil
+	}
 }
 
 func PrintQRCode(buf []byte) {
-	_, s, err := image.Decode(bytes.NewReader(buf))
+	img, s, err := image.Decode(bytes.NewReader(buf))
 	if err != nil {
-		return
+		log.Fatal(err)
 	}
+
+	bmp, err := gozxing.NewBinaryBitmapFromImage(img)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	res, err := qrcode.NewQRCodeReader().Decode(bmp, nil)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	qr, err := goQrcode.New(res.String(), goQrcode.High)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	fmt.Println(qr.ToSmallString(false))
+
 	log.Print(s)
 }
 
-func CrawArticlewithCondition(cookies []selenium.Cookie,
+func CrawArticlewithCondition(cookies utils.Cookies,
 	getArgs utils.AppMsgArgs, condition utils.Condition) utils.AppMsgListItems {
 
 	var ret bool
@@ -264,7 +265,7 @@ func CrawArticlewithCondition(cookies []selenium.Cookie,
 	return appMsgList
 }
 
-func CrawArticle(cookies []selenium.Cookie, getArgs utils.AppMsgArgs) ([]byte, []selenium.Cookie) {
+func CrawArticle(cookies utils.Cookies, getArgs utils.AppMsgArgs) ([]byte, utils.Cookies) {
 	client := &http.Client{}
 
 	targetUrl := "https://mp.weixin.qq.com/cgi-bin/appmsg"
@@ -312,10 +313,11 @@ func CrawArticle(cookies []selenium.Cookie, getArgs utils.AppMsgArgs) ([]byte, [
 	// Update cookies with response cookies
 	for idx := 0; idx < len(respCookies); idx++ {
 		oldIdx := utils.IdxofCookieswithName(cookies, respCookies[idx].Name)
+		ctCookie := utils.ConvertToSeleniumCookie(respCookies[idx])
 		if oldIdx > -1 {
-			updatedCookies[oldIdx] = utils.ConvertToSeleniumCookie(respCookies[idx])
+			*updatedCookies.Cookies[oldIdx] = ctCookie
 		} else {
-			updatedCookies = append(updatedCookies, utils.ConvertToSeleniumCookie(respCookies[idx]))
+			updatedCookies.Cookies = append(updatedCookies.Cookies, &ctCookie)
 		}
 	}
 
