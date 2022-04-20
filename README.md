@@ -3,11 +3,14 @@
 微信公众号文章爬取的半自动化工具，当初是为了方便获取玄武实验室的每日推送而写的。并不适合大规模批量的获取公众号的文章内容，也不打算这么去做。由于不确定反爬虫机制，所以每次请求之间会有一些时间间隔。
 
 ## Table of Contents
-- [Introduction](#introduction)
-   - [ChromeDp](#chromedp)
-   - [Usage](#usage)  
-- [Features](#features)
-- [Principle](#Principle)
+- [Wechat Article Crawler](#wechat-article-crawler)
+  - [Table of Contents](#table-of-contents)
+  - [Introduction](#introduction)
+    - [ChromeDp](#chromedp)
+    - [Usage](#usage)
+    - [配置文件](#配置文件)
+  - [Features](#features)
+  - [Principle](#principle)
 
 ## Introduction
 
@@ -24,7 +27,7 @@
 go run main.go
 ```
 
-默认会打印出`json`格式的文章数据，如下：
+默认会将结果保存为`json`格式的文章数据，如下：
 
 ```json
 {
@@ -61,7 +64,7 @@ chromedp:
 appmsg:
   # 文章title关键词
   query: 每日安全
-  # 公众号的唯一id
+  # 公众号的唯一id，如果想爬取其它公众号，请自行替换它
   fakeid: MzA5NDYyNDI0MA==
   # 时间需要以如下格式进行填写，设定后会获取该时间后（包括该时间）的符合条件的文章
   timeline: 2022-03-22T15:04:05
