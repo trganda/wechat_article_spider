@@ -1,4 +1,4 @@
-package crawer
+package crawler
 
 import (
 	"bytes"
@@ -13,8 +13,8 @@ import (
 	"net/http"
 	"net/url"
 	"time"
-	"wechat_crawer/config"
-	"wechat_crawer/utils"
+	"wechat_crawler/config"
+	"wechat_crawler/utils"
 
 	"github.com/chromedp/cdproto/network"
 	"github.com/chromedp/chromedp"

@@ -8,9 +8,9 @@ import (
 	"os"
 	"strings"
 	"time"
-	"wechat_crawer/config"
-	"wechat_crawer/crawler"
-	"wechat_crawer/utils"
+	"wechat_crawler/config"
+	"wechat_crawler/crawler"
+	"wechat_crawler/utils"
 )
 
 func main() {
@@ -29,7 +29,7 @@ func main() {
 		}
 
 		log.Println("login...")
-		cookies, urlArgs, err = crawer.Login()
+		cookies, urlArgs, err = crawler.Login()
 		if err != nil {
 			log.Fatalf("catch cookie failed. error: %s\n", err.Error())
 			return
@@ -73,9 +73,9 @@ func main() {
 	var ret utils.AppMsgListItems
 
 	if config.Cfg.AppMsgQueryArgs.TimeLine == "" {
-		ret = crawer.CrawArticlewithCondition(cookies, urlArgs, crawer.DefaultFilterCondition)
+		ret = crawler.CrawArticlewithCondition(cookies, urlArgs, crawler.DefaultFilterCondition)
 	} else {
-		ret = crawer.CrawArticlewithCondition(cookies, urlArgs, crawer.FilterCondition)
+		ret = crawler.CrawArticlewithCondition(cookies, urlArgs, crawler.FilterCondition)
 	}
 	if len(ret.Items) < 1 {
 		log.Fatalf("noting get from server, check you configuration file or cookies.")
@@ -101,7 +101,7 @@ func main() {
 		log.Println("writing data to " + fileName)
 	} else if config.Cfg.AppMsgQueryArgs.DumpFormat == "html" {
 		for idx := 0; idx < len(ret.Items); idx++ {
-			crawer.DumpItem(ret.Items[idx], "data/")
+			crawler.DumpItem(ret.Items[idx], "data/")
 		}
 	}
 }

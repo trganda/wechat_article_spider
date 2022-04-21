@@ -1,8 +1,8 @@
-package crawer
+package crawler
 
 import (
 	"testing"
-	"wechat_crawer/utils"
+	"wechat_crawler/utils"
 )
 
 func TestDumpPage(t *testing.T) {

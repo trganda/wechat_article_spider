@@ -1,11 +1,12 @@
 package config
 
 import (
-	"gopkg.in/yaml.v2"
 	"io/ioutil"
 	"log"
 	"time"
-	"wechat_crawer/utils"
+	"wechat_crawler/utils"
+
+	"gopkg.in/yaml.v2"
 )
 
 var (

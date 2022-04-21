@@ -1,17 +1,18 @@
-package crawer
+package crawler
 
 import (
 	"bytes"
 	"fmt"
-	"github.com/PuerkitoBio/goquery"
 	"io/ioutil"
 	"log"
 	"net/url"
 	"os"
 	"path"
 	"strings"
-	"wechat_crawer/config"
-	"wechat_crawer/utils"
+	"wechat_crawler/config"
+	"wechat_crawler/utils"
+
+	"github.com/PuerkitoBio/goquery"
 
 	"github.com/gocolly/colly/v2"
 )
@@ -37,7 +38,7 @@ func DumpPage(urlPath string, title string, rootPrefix string) {
 			return
 		}
 	}
-	
+
 	fmt.Println(parsedUrl.Path)
 
 	c := colly.NewCollector(

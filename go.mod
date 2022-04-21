@@ -1,4 +1,4 @@
-module wechat_crawer
+module wechat_crawler
 
 go 1.17
 
