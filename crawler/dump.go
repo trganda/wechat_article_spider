@@ -28,7 +28,7 @@ func DumpPage(urlPath string, title string, rootPrefix string) {
 		log.Fatalf("parse url %s failed, please check it. error: %s\n", urlPath, err.Error())
 	}
 
-	pathPrefix := rootPrefix + title + "/"
+	pathPrefix := path.Join(rootPrefix, title)
 
 	// Mkdir with title
 	if !utils.FileExist(pathPrefix) {
@@ -87,7 +87,7 @@ func DumpPage(urlPath string, title string, rootPrefix string) {
 			if err != nil {
 				log.Printf("load document from %s failed. error: %s\n", r.Request.URL.String(), err.Error())
 				log.Println("skipped.")
-				err = r.Save(pathPrefix + title + ".html")
+				err = r.Save(path.Join(pathPrefix, title+".html"))
 				if err != nil {
 					return
 				}
@@ -111,9 +111,9 @@ func DumpPage(urlPath string, title string, rootPrefix string) {
 				if err != nil {
 					return
 				}
-				err = ioutil.WriteFile(pathPrefix+title+".html", []byte(html), 0644)
+				err = ioutil.WriteFile(path.Join(pathPrefix, title+".html"), []byte(html), 0644)
 				if err != nil {
-					log.Fatalf("dump %s failed, error %s", pathPrefix+title+".html", err)
+					log.Fatalf("dump %s failed, error %s", path.Join(pathPrefix, title+".html"), err)
 				}
 			}
 
@@ -126,12 +126,12 @@ func DumpPage(urlPath string, title string, rootPrefix string) {
 		urlPath := path.Clean(path.Dir(requestUrl.Path))
 		urlFileName := path.Base(requestUrl.Path)
 
-		err := os.MkdirAll(pathPrefix+urlPath, os.ModePerm)
+		err := os.MkdirAll(path.Join(pathPrefix, urlPath), os.ModePerm)
 		if err != nil {
 			return
 		}
 
-		err = r.Save(pathPrefix + urlPath + "/" + urlFileName)
+		err = r.Save(path.Join(pathPrefix, urlPath, urlFileName))
 		if err != nil {
 			return
 		}
