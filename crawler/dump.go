@@ -28,6 +28,10 @@ func DumpPage(urlPath string, title string, rootPrefix string) {
 		log.Fatalf("parse url %s failed, please check it. error: %s\n", urlPath, err.Error())
 	}
 
+	// replace the '/' or '\' of title with '-'
+	title = strings.TrimSpace(title)
+	title = strings.ReplaceAll(title, "/", "-")
+	title = strings.ReplaceAll(title, `\`, "-")
 	pathPrefix := path.Join(rootPrefix, title)
 
 	// Mkdir with title
