@@ -43,8 +43,6 @@ func DumpPage(urlPath string, title string, rootPrefix string) {
 		}
 	}
 
-	fmt.Println(parsedUrl.Path)
-
 	c := colly.NewCollector(
 		colly.UserAgent(config.UserAgent),
 	)

@@ -6,6 +6,7 @@ import (
 	"io/ioutil"
 	"log"
 	"os"
+	"path"
 	"strings"
 	"time"
 	"wechat_crawler/config"
@@ -92,7 +93,7 @@ func main() {
 	}
 
 	if config.Cfg.AppMsgQueryArgs.DumpFormat == "json" {
-		fileName := "data/data-" + strings.ReplaceAll(time.Now().Format(config.TimeFormat), ":", "-") + ".json"
+		fileName := path.Join("data", "data-"+strings.ReplaceAll(time.Now().Format(config.TimeFormat), ":", "-")+".json")
 		err = ioutil.WriteFile(fileName, jsonRet, 0644)
 		if err != nil {
 			log.Fatalf("writing data to %s error: %s\n", fileName, err.Error())

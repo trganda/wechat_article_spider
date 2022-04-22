@@ -7,4 +7,4 @@ appmsg:
   query: 每日安全动态推送
   fakeid: MzA5NDYyNDI0MA==
   timeline: 2022-04-05T20:37:42
-  dumpformat: html
+  dumpformat: json
