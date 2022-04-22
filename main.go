@@ -6,18 +6,18 @@ import (
 	"io/ioutil"
 	"log"
 	"os"
+	"path"
+	"strings"
 	"time"
-	"wechat_crawer/config"
-	"wechat_crawer/crawer"
-	"wechat_crawer/utils"
-
-	"github.com/tebeka/selenium"
+	"wechat_crawler/config"
+	"wechat_crawler/crawler"
+	"wechat_crawler/utils"
 )
 
 func main() {
 	config.InitConfig("config.yaml")
 
-	var cookies []selenium.Cookie
+	var cookies utils.Cookies
 	var urlArgs utils.AppMsgArgs
 	var err error
 
@@ -30,7 +30,7 @@ func main() {
 		}
 
 		log.Println("login...")
-		cookies, urlArgs, err = crawer.Login()
+		cookies, urlArgs, err = crawler.Login()
 		if err != nil {
 			log.Fatalf("catch cookie failed. error: %s\n", err.Error())
 			return
@@ -74,20 +74,35 @@ func main() {
 	var ret utils.AppMsgListItems
 
 	if config.Cfg.AppMsgQueryArgs.TimeLine == "" {
-		ret = crawer.CrawArticlewithCondition(cookies, urlArgs, crawer.DefaultFilterCondition)
+		ret = crawler.CrawArticlewithCondition(cookies, urlArgs, crawler.DefaultFilterCondition)
 	} else {
-		ret = crawer.CrawArticlewithCondition(cookies, urlArgs, crawer.FilterCondition)
+		ret = crawler.CrawArticlewithCondition(cookies, urlArgs, crawler.FilterCondition)
 	}
 	if len(ret.Items) < 1 {
-		log.Fatalf("noting get from server, check you configuration file.")
+		log.Fatalf("noting get from server, check you configuration file or cookies.")
 	}
-	jsonRet, _ := json.MarshalIndent(ret, "", "  ")
 
-	fileName := "data/data-" + time.Now().Format(config.TimeFormat) + ".json"
-	err = ioutil.WriteFile(fileName, jsonRet, 0644)
-	if err != nil {
-		log.Fatalf("writing data to %s error: %s\n", fileName, err.Error())
-		return
+	for idx := 0; idx < len(ret.Items); idx++ {
+		ret.Items[idx].Title = strings.ReplaceAll(ret.Items[idx].Title, "<em>", "")
+		ret.Items[idx].Title = strings.ReplaceAll(ret.Items[idx].Title, "</em>", "")
 	}
-	log.Println("writing data to " + fileName)
+
+	jsonRet, err := utils.JsonMarshalwithNoHTMLEscape(ret)
+	if err != nil {
+		log.Fatalf("format data to json failed. error: %s\n", err.Error())
+	}
+
+	if config.Cfg.AppMsgQueryArgs.DumpFormat == "json" {
+		fileName := path.Join("data", "data-"+strings.ReplaceAll(time.Now().Format(config.TimeFormat), ":", "-")+".json")
+		err = ioutil.WriteFile(fileName, jsonRet, 0644)
+		if err != nil {
+			log.Fatalf("writing data to %s error: %s\n", fileName, err.Error())
+			return
+		}
+		log.Println("writing data to " + fileName)
+	} else if config.Cfg.AppMsgQueryArgs.DumpFormat == "html" {
+		for idx := 0; idx < len(ret.Items); idx++ {
+			crawler.DumpItem(ret.Items[idx], "data/")
+		}
+	}
 }

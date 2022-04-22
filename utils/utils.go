@@ -1,37 +1,45 @@
 package utils
 
 import (
+	"bytes"
+	"encoding/json"
 	"math/rand"
 	"net/http"
 	"os"
 	"strconv"
 	"time"
-
-	"github.com/tebeka/selenium"
 )
 
-func ConvertToHttpCookies(sourceCookies []selenium.Cookie) []http.Cookie {
+func ConvertToHttpCookies(sourceCookies Cookies) []http.Cookie {
 	var cookies []http.Cookie
 
-	for idx := 0; idx < len(sourceCookies); idx++ {
-		cookie := http.Cookie{
-			Name:    sourceCookies[idx].Name,
-			Value:   sourceCookies[idx].Value,
-			Path:    sourceCookies[idx].Path,
-			Domain:  sourceCookies[idx].Domain,
-			Secure:  sourceCookies[idx].Secure,
-			Expires: time.Unix(int64(sourceCookies[idx].Expiry), 0),
-		}
+	for idx := 0; idx < len(sourceCookies.Cookies); idx++ {
+		cookie := ConvertToHttpCookie(sourceCookies.Cookies[idx])
 		cookies = append(cookies, cookie)
 	}
 
 	return cookies
 }
 
-func ConvertToSeleniumCookie(sourceCookies *http.Cookie) selenium.Cookie {
-	var cookie selenium.Cookie
+func ConvertToHttpCookie(sourceCookie *Cookie) http.Cookie {
+	var cookie http.Cookie
 
-	cookie = selenium.Cookie{
+	cookie = http.Cookie{
+		Name:    sourceCookie.Name,
+		Value:   sourceCookie.Value,
+		Path:    sourceCookie.Path,
+		Domain:  sourceCookie.Domain,
+		Secure:  sourceCookie.Secure,
+		Expires: time.Unix(int64(sourceCookie.Expiry), 0),
+	}
+
+	return cookie
+}
+
+func ConvertToCookie(sourceCookies *http.Cookie) Cookie {
+	var cookie Cookie
+
+	cookie = Cookie{
 		Name:   sourceCookies.Name,
 		Value:  sourceCookies.Value,
 		Path:   sourceCookies.Path,
@@ -43,9 +51,9 @@ func ConvertToSeleniumCookie(sourceCookies *http.Cookie) selenium.Cookie {
 	return cookie
 }
 
-func IdxofCookieswithName(cookies []selenium.Cookie, name string) int {
-	for idx := 0; idx < len(cookies); idx++ {
-		if cookies[idx].Name == name {
+func IdxofCookieswithName(cookies Cookies, name string) int {
+	for idx := 0; idx < len(cookies.Cookies); idx++ {
+		if cookies.Cookies[idx].Name == name {
 			return idx
 		}
 	}
@@ -70,4 +78,18 @@ func RandDuration() time.Duration {
 	}
 
 	return duration
+}
+
+func JsonMarshalwithNoHTMLEscape(data interface{}) ([]byte, error) {
+	buf := bytes.NewBuffer([]byte{})
+
+	jsonEncoder := json.NewEncoder(buf)
+	jsonEncoder.SetEscapeHTML(false)
+	jsonEncoder.SetIndent("", "  ")
+	err := jsonEncoder.Encode(data)
+	if err != nil {
+		return nil, err
+	}
+
+	return buf.Bytes(), nil
 }
