@@ -10,7 +10,7 @@
   - [Introduction](#introduction)
     - [ChromeDp](#chromedp)
     - [Usage](#usage)
-    - [配置文件](#配置文件)
+    - [Configuration](#Configuration)
   - [Features](#features)
   - [Principle](#principle)
 
@@ -51,7 +51,7 @@ go run main.go
 }
 ```
 
-### 配置文件
+### Configuration
 
 通过`yaml`格式的配置文件进行控制。默认读取当前目录下的`config.yaml`文件
 
