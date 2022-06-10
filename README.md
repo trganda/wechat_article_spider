@@ -1,5 +1,17 @@
 # Wechat Article Crawler
 
+<!-- markdownlint-disable first-line-heading -->
+<p align="center">
+  <p align="center">
+    <a href="https://github.com/trganda/wechat_article_spider/blob/main/LICENSE">
+      <img src="https://img.shields.io/github/license/trganda/wechat_article_spider">
+    </a>
+    <a href="https://github.com/trganda/wechat_article_spider/actions/workflows/go.yml">
+      <img src="https://img.shields.io/github/workflow/status/trganda/wechat_article_spider/Go">
+    </a>
+  </p>
+</p>
+
 > 尴了个大尬，如果想查看玄武实验室历史推送内容，可以访问`https://sec.today`。
 
 微信公众号文章爬取的半自动化工具，当初是为了方便获取玄武实验室的每日推送而写的。并不适合大规模批量的获取公众号的文章内容，也不打算这么去做。由于不确定反爬虫机制，所以每次请求之间会有一些时间间隔。
